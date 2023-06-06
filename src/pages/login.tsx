@@ -1,7 +1,33 @@
 import Head from "next/head";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { FormEvent, useState } from "react";
+import apiClient from "../lib/apiclient";
+import { useAuth } from "../context/auth";
 
 const Login = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const router = useRouter();
+
+  const { login } = useAuth();
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const res = await apiClient.post<{ token: string }>("/auth/login", {
+        email,
+        password,
+      });
+      const token = res.data.token;
+      login(token);
+      router.push("/");
+    } catch (error) {
+      alert("入力内容が正しくありません");
+      console.log(error);
+    }
+  };
+
   return (
     <div
       style={{ height: "88vh" }}
@@ -17,7 +43,7 @@ const Login = () => {
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"
@@ -32,6 +58,8 @@ const Login = () => {
                 autoComplete="email"
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="mt-6">
@@ -48,6 +76,8 @@ const Login = () => {
                 autoComplete="current-password"
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div className="mt-6">
