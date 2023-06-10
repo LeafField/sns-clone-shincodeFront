@@ -11,11 +11,6 @@ const SignUp = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({
-      username,
-      email,
-      password,
-    });
 
     try {
       await apiClient.post("/auth/register", {
